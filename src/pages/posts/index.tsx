@@ -1,11 +1,23 @@
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Prismic from '@prismicio/client';
+import { RichText } from 'prismic-dom';
 
 import { getPrismicClient } from '../../services/prismic';
 import styles from './styles.module.scss';
 
-export default function Posts() {
+interface Post {
+  slug: string,
+  title: string,
+  excerpt: string;
+  updatedAt: string;
+}
+
+interface PostProps {
+  posts: Post[];
+}
+
+export default function Posts({ posts }: PostProps) {
   return (
     <>
       <Head>
@@ -14,23 +26,15 @@ export default function Posts() {
 
       <main className={styles.container}>
         <div className={styles.posts}>
-          <a href="#">
-            <time>12 de março de 2018</time>
-            <strong>Como renomear vários arquivos de uma vez usando o terminal</strong>
-            <p>Suponha que seu projeto tenha uma base de código com 150 arquivos JavaScript e você precisar migrar para TypeScript alterando as extensões dos arquivos. </p>
-          </a>
-
-          <a href="#">
-            <time>12 de março de 2018</time>
-            <strong>Como renomear vários arquivos de uma vez usando o terminal</strong>
-            <p>Suponha que seu projeto tenha uma base de código com 150 arquivos JavaScript e você precisar migrar para TypeScript alterando as extensões dos arquivos. </p>
-          </a>
-
-          <a href="#">
-            <time>12 de março de 2018</time>
-            <strong>Como renomear vários arquivos de uma vez usando o terminal</strong>
-            <p>Suponha que seu projeto tenha uma base de código com 150 arquivos JavaScript e você precisar migrar para TypeScript alterando as extensões dos arquivos. </p>
-          </a>
+          {
+            posts.map(post => (
+              <a href="#" key={post.slug}>
+                <time>{post.updatedAt}</time>
+                <strong>{post.title}</strong>
+                <p>{post.excerpt}</p>
+              </a>
+            ))
+          }
         </div>
       </main>
     </>
@@ -40,19 +44,33 @@ export default function Posts() {
 export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient();
 
-  const response = await prismic.query(
+  const response = await prismic.query<any>(
     Prismic.Predicates.at('document.type', 'post'),
     {
-      fetch: ['Post.title', 'Post.content'],
+      fetch: ['post.title', 'post.content'],
       pageSize: 100,
     }
   );
 
-  console.log(response)
+  // console.log(response)
+
+  const posts = response.results.map(post => {
+    
+    return {
+      slug: post.uid,
+      title: RichText.asText(post.data.title),
+      excerpt: post.data.content.find(content => content.type === 'paragraph')?.text ?? '',
+      updatedAt: new Date(post.last_publication_date).toLocaleDateString('pt-Br', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      })
+    }
+  })
 
   return {
     props: {
-
+      posts
     }
   }
 }
