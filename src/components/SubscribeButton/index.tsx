@@ -7,6 +7,10 @@ interface SubscribeButtonProps {
   priceId: string;
 }
 
+// getServerSideProps (SSR) (usado na rederização da página)
+// getStaticProps (SSG) (usado na rederização da página)
+// API Routes (usada aparti de um click do usuario)
+
 export function SubscribeButton({priceId}: SubscribeButtonProps) {
   const [session] = useSession();
 

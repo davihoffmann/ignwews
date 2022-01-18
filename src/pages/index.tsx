@@ -14,9 +14,9 @@ interface HomeProps {
   }
 }
 
-// Client-Side
-// Server-Side
-// Static Site Generation
+// Client-Side (Chama mais rápida que não tem necessidade de indexação)
+// Server-Side (Quando necessário buscar algo que vai ser utilizados para indexação e motores de busca)
+// Static Site Generation (Quando é igual para todos os usuários)
 
 // Ex.: Blog
 // conteudo (ssg)

@@ -1,3 +1,4 @@
+//INTEGRAÇÃO COM O FRONT
 import { loadStripe } from '@stripe/stripe-js';
 
 export async function getStripeJs() {
